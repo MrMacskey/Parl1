@@ -1,37 +1,42 @@
 #include <iostream>
 #include <omp.h>
 using namespace std;
-​
-int main() {
-​ ​ const int n = 20;
-​ ​ int i;
-​ ​ int a[n];
-​ ​ for (i = 0; i < n; i++) {
-​ ​ ​ ​ cout«"a["«i«"] = ";
-​ ​ ​ ​ cin » a[i];
-​ ​ }
+
+int main(){
+	const int n = 5;
+	int i;
+	int a[n];
+	for (i = 0; i < n; i++) {
+		cout << "a[i]" << endl;
+		cin >> a[i];
+	}
 #pragma omp parallel private(i) shared(n) num_threads(n)
-​ ​ { ​ ​ int control = n - 1;
-​ ​ int left = 0;
-​ ​ int right = n - 1;
+	{
+		int control = n - 1;
+		int left = 0;
+		int right = n - 1;
 #pragma omp for
-​ ​ ​ ​ ​ ​ for(int k=0;k<=right;k++){
-​ ​ ​ ​ ​ ​ ​ ​ for (i = left; i < right; i++) {
-​ ​ ​ ​ ​ ​ ​ ​ ​ ​ if (a[i] > a[i + 1]) {
-​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ std::swap(a[i], a[i + 1]);
-​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ control = i;
-​ ​ ​ ​ ​ ​ ​ ​ ​ ​ }
-​ ​ ​ ​ ​ ​ ​ ​ }
-​ ​ ​ ​ ​ ​ ​ ​ right = control;
-​ ​ ​ ​ ​ ​ ​ ​ for (i = right; i > left; i--) {
-​ ​ ​ ​ ​ ​ ​ ​ ​ ​ if (a[i] < a[i + 1]) {
-​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ std::swap(a[i], a[i - 1]);
-​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ control = i;
-​ ​ ​ ​ ​ ​ ​ ​ ​ ​ }
-​ ​ ​ ​ ​ ​ ​ ​ }
-​ ​ ​ ​ ​ ​ ​ ​ left = control;
-​ ​ ​ ​ ​ ​ }​
-​ ​ }
-​ ​ for ( i = 0; i < n; i++)
-​ ​ ​ ​ cout « a[i] « endl;
+		for (int k = 0; k <= right; k++) {
+			for (i = left; i < right; i++) {
+				if (a[i] > a[i + 1]) {
+					int tm = a[i];
+					a[i] = a[i + 1];
+					a[i + 1] = tm;
+					control = i;
+				}
+			}
+			right = control;
+			for (i = right; i > left; i--) {
+				if (a[i] < a[i + 1]) {
+					int tm = a[i];
+					a[i] = a[i - 1];
+					a[i + 1] = tm;
+				}
+			}
+			left = control;
+		}
+	}
+	for (i = 0; i < n; i++) {
+		cout << a[i] << endl;
+	}
 }
