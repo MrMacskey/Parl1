@@ -1,42 +1,53 @@
 #include <iostream>
 #include <omp.h>
 using namespace std;
-
-int main(){
-	const int n = 5;
-	int i;
-	int a[n];
-	for (i = 0; i < n; i++) {
-		cout << "a[i]" << endl;
-		cin >> a[i];
-	}
-#pragma omp parallel private(i) shared(n) num_threads(n)
-	{
-		int control = n - 1;
-		int left = 0;
-		int right = n - 1;
-#pragma omp for
-		for (int k = 0; k <= right; k++) {
-			for (i = left; i < right; i++) {
-				if (a[i] > a[i + 1]) {
-					int tm = a[i];
-					a[i] = a[i + 1];
-					a[i + 1] = tm;
-					control = i;
-				}
+void shaker_sort(int arr[], int n) {
+	int left = 0;
+	int right = n - 1;
+	int flag = 1;
+	while (left < right && flag > 0) {
+		flag = 0;
+#pragma omp parallel for shared(arr, flag, left, right)
+		for (int i = left; i < right; i++) {
+			if (arr[i] > arr[i + 1]) {
+				int temp = arr[i];
+				arr[i] = arr[i + 1];
+				arr[i + 1] = temp;
+				flag = 1;
 			}
-			right = control;
-			for (i = right; i > left; i--) {
-				if (a[i] < a[i + 1]) {
-					int tm = a[i];
-					a[i] = a[i - 1];
-					a[i + 1] = tm;
-				}
-			}
-			left = control;
 		}
+		right--;
+
+#pragma omp parallel for shared(arr, flag, left, right)
+		for (int i = right; i > left; i--) {
+			if (arr[i] < arr[i - 1]) {
+				int temp = arr[i];
+				arr[i] = arr[i - 1];
+				arr[i - 1] = temp;
+				flag = 1;
+			}
+		}
+		left++;
 	}
-	for (i = 0; i < n; i++) {
-		cout << a[i] << endl;
+}
+
+int main() {
+	int arr[] = { 5, 1, 9, 3, 7, 2, 8, 4, 6 };
+	int n = sizeof(arr) / sizeof(arr[0]);
+
+	std::cout << "Before sorting:\n";
+	for (int i = 0; i < n; i++) {
+		std::cout << arr[i] << " ";
 	}
+	std::cout << std::endl;
+
+	shaker_sort(arr, n);
+
+	std::cout << "After sorting:\n";
+	for (int i = 0; i < n; i++) {
+		std::cout << arr[i] << " ";
+	}
+	std::cout << std::endl;
+
+	return 0;
 }
