@@ -7,7 +7,7 @@ void shaker_sort(int arr[], int n) {
 	int flag = 1;
 	while (left < right && flag > 0) {
 		flag = 0;
-#pragma omp parallel for shared(arr, flag, left, right)
+#pragma omp parallel for shared(arr, flag, left, right) num_threads(4)
 		for (int i = left; i < right; i++) {
 			if (arr[i] > arr[i + 1]) {
 				int temp = arr[i];
@@ -18,7 +18,7 @@ void shaker_sort(int arr[], int n) {
 		}
 		right--;
 
-#pragma omp parallel for shared(arr, flag, left, right)
+#pragma omp parallel for shared(arr, flag, left, right) num_threads(4)
 		for (int i = right; i > left; i--) {
 			if (arr[i] < arr[i - 1]) {
 				int temp = arr[i];
@@ -34,7 +34,6 @@ void shaker_sort(int arr[], int n) {
 int main() {
 	int arr[] = { 5, 1, 9, 3, 7, 2, 8, 4, 6 };
 	int n = sizeof(arr) / sizeof(arr[0]);
-
 	std::cout << "Before sorting:\n";
 	for (int i = 0; i < n; i++) {
 		std::cout << arr[i] << " ";
